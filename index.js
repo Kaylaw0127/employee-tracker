@@ -37,7 +37,7 @@ inquirer
   choices: 
     [`View all employees`, 
     `View all employees by department`, 
-    `View all employees by manager`, 
+    `View all employees by manager id`, 
     `Add employee`, 
     `Remove employee`, 
     `Update employee role`, 
@@ -60,7 +60,7 @@ inquirer
       getEmployeeByDepartment()
       break
 
-    case `View all employees by manager`:
+    case `View all employees by manager id`:
       getEmployeeByManager()
       break
 
@@ -107,4 +107,278 @@ inquirer
 })
 }
 
+
+const getAllEmployees = function () {
+connection.query("SELECT * FROM employees;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+
+start()
+})
+}
+
+const seeDepartments = function () {
+connection.query("SELECT * FROM departments;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+
+start()
+})
+}
+
+const getEmployeeByDepartment = function () {
+connection.query("SELECT * FROM employees ORDER BY roles.departments_id;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+
+start()
+})
+}
+
+const getEmployeeByManager = function () {
+connection.query("SELECT * FROM employees ORDER BY employees.manager_id;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+
+start()
+})
+}
+
+const addEmployee = function () {
+console.log(`Add information about your new employee `)
+inquirer
+.prompt([
+{
+  type: `input`,
+  message: `What is the employee's first name?`,
+  name: `first_name`
+},
+{
+  type: `input`,
+  message: `What is the employee's last name?`,
+  name: `last_name`
+},
+{
+  type: `number`,
+  message: `What is the employee's role ID number??`,
+  name: `role_id`
+},
+{
+  type: `number`,
+  message: `What is the employee's manager's ID number??`,
+  name: `manager_id`
+}
+]).then((answers) => {
+connection.query(
+  "INSERT INTO employees SET ?", answers, function (err, res) {
+    if (err) throw err;
+    console.log(`Employee added!`);
+    start()
+  }
+)
+
+})
+
+}
+
+const removeEmployee = function () {
+connection.query("SELECT * FROM employees;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+})
+
+inquirer
+.prompt({
+type: `input`,
+message: `What employee ID would you like to delete?`,
+name: `deleteID`
+}).then((answer) => {
+console.log(answer)
+connection.query("DELETE FROM employees WHERE id = ?", answer.deleteID, function (err, res) {
+  if (err) throw err;
+
+  console.log(`Employee has been deleted`)
+  start()
+})
+})
+}
+
+const updateEmployeeRole = function () {
+connection.query("SELECT * FROM employees;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+})
+connection.query("SELECT * FROM roles;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+})
+inquirer
+.prompt([
+{
+  type: `input`,
+  message: `What employee ID would you like to edit the role of?`,
+  name: `updateRole`
+},
+{
+  type: `input`,
+  message: `What role ID would you like to give them?`,
+  name: `newRole`
+}
+]).then((answer) => {
+console.log(answer)
+connection.query("UPDATE employees SET role_id = ? WHERE id = ?", [answer.newRole, answer.updateRole], function (err, res) {
+  if (err) throw err;
+
+  console.log(`Role has bene updated`)
+  start()
+})
+})
+}
+
+const updateEmployeeManager = function () {
+connection.query("SELECT * FROM employees;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+})
+connection.query("SELECT * FROM roles;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+})
+inquirer
+.prompt([
+{
+  type: `input`,
+  message: `What employee ID would you like to edit the role of?`,
+  name: `updateRole`
+},
+{
+  type: `input`,
+  message: `What role ID would you like to give them?`,
+  name: `newRole`
+}
+]).then((answer) => {
+console.log(answer)
+connection.query("UPDATE employees SET role_id = ? WHERE id = ?", [answer.newRole, answer.updateRole], function (err, res) {
+  if (err) throw err;
+
+  console.log(`Role has been updated`)
+  start()
+})
+})
+}
+const viewAllRoles = function () {
+connection.query("SELECT * FROM roles;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+
+start()
+})
+}
+
+const addRole = function () {
+console.log(`Adding a new role!...\n`)
+inquirer
+.prompt([
+{
+  type: `input`,
+  message: `What is the role title?`,
+  name: `title`
+},
+{
+  type: `input`,
+  message: `What is the role's salary?`,
+  name: `salary`
+},
+{
+  type: `number`,
+  message: `What is the role's department ID number?`,
+  name: `department_id`
+}
+]).then((answers) => {
+connection.query(
+  "INSERT INTO employee_tracker_db.roles SET ?", answers, function (err, res) {
+    if (err) throw err;
+    console.log(`Role has been added!`);
+    start()
+  }
+)
+
+})
+}
+
+
+const removeRole = function () {
+connection.query("SELECT * FROM employee_tracker_db.roles;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+})
+inquirer
+.prompt({
+type: `input`,
+message: `What role ID would you like to delete?`,
+name: `deleteID`
+}).then((answer) => {
+console.log(answer)
+connection.query("DELETE FROM employee_tracker_db.roles WHERE id = ?", answer.deleteID, function (err, res) {
+  if (err) throw err;
+
+  console.log(`Role has been deleted`)
+  start()
+})
+})
+}
+
+const addDepartment = function (){
+console.log(`Adding a new department \n`)
+inquirer
+.prompt([
+{
+  type: `input`,
+  message: `What is the department called?`,
+  name: `name`
+}
+]).then((answers) => {
+connection.query(
+  "INSERT INTO employee_tracker_db.departments SET ?", answers, function (err, res) {
+    if (err) throw err;
+    console.log(`department has been added!`);
+    start()
+  }
+)
+
+})
+}
+
+const removeDepartment = function () {
+connection.query("SELECT * FROM employee_tracker_db.departments;", function (err, res) {
+if (err) throw err;
+
+console.table(res)
+})
+inquirer
+.prompt({
+type: `input`,
+message: `What department ID would you like to delete?`,
+name: `deleteID`
+}).then((answer) => {
+console.log(answer)
+connection.query("DELETE FROM employee_tracker_db.departments WHERE id = ?", answer.deleteID, function (err, res) {
+  if (err) throw err;
+
+  console.log(`Department has been deleted`)
+  start()
+})
+})
+}
 start()
