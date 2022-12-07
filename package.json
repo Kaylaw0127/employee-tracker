@@ -4,7 +4,7 @@
   "description": "# Description An app for managing a company's employees using node, inquirer, and MySQL.",
   "main": "index.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "express-handlebars": "^4.0.0",
     "inquirer": "^7.1.0",
     "mysql": "^2.18.1",
